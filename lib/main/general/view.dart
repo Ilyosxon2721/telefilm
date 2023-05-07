@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -33,7 +34,7 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
     File file = path != ''
         ? File(path)
         : await telegramGetters.getFile(photoId, 1, 1, 0, true);
-    return File(path);
+    return file;
   }
 
   // void getChannelPhoto(int index) async {
@@ -135,6 +136,11 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
     }
   }
 
+  Widget _buildVideoPlayerWidget(File video) {
+    controller.setVideoController(video);
+    return Chewie(controller: controller.chewieController.value);
+  }
+
   Widget _buildHeaderForPost(
       int index, history.Message message, channel, String date) {
     return ListTile(
@@ -214,12 +220,25 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
     final photoFile = File(photoPath);
     final videoPath = message.content?.video?.video?.local?.path ?? '';
     final videoFile = File(videoPath);
+    final videoFileId = message.content?.video?.video?.id;
     final videoDownloadedSize =
         message.content?.video?.video?.local?.downloadedSize ?? 0;
     final videoFileSize = message.content?.video?.video?.size ?? 0;
+    final updateFileId = telegramDatas.updateFile.value.file?.id;
+    final downloadSize =
+        (telegramDatas.updateFile.value.file?.local?.downloadedSize ??
+                0.0 * math)
+            .roundToDouble()
+            .toString();
     return GetX<AndroidGeneralPageController>(
       init: AndroidGeneralPageController(),
-      initState: (_) {},
+      initState: (_) {
+        // Future.delayed(Duration.zero, () {
+        //   videoPath != ''
+        //       ? controller.setVideoController(File(videoPath))
+        //       : null;
+        // });
+      },
       builder: (logic) {
         return GestureDetector(
           key: GlobalKey(),
@@ -227,19 +246,19 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
             PersistentNavBarNavigator.pushNewScreenWithRouteSettings(
               context,
               settings: RouteSettings(arguments: {
-                "heroTag": "contentImage",
-                "imageIndex": "${logic.post[index]}",
+                "heroTag": "video$index",
+                "message": message,
               }),
               screen: AndroidContentInfoPage(),
               withNavBar: true,
-              pageTransitionAnimation: PageTransitionAnimation.rotate,
+              pageTransitionAnimation: PageTransitionAnimation.fade,
             );
           },
           // onTap: () => Get.toNamed(AppRoutes.contentInfo,
           //     arguments: ["contentImage"]),
           child: logic.post.isNotEmpty
               ? Hero(
-                  tag: "contentImage",
+                  tag: "video$index",
                   child: Stack(
                     alignment: AlignmentDirectional.bottomEnd,
                     children: [
@@ -250,9 +269,13 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
                         child: photoFile.path != ''
                             ? Image.file(
                                 photoFile,
-                                width: MediaQuery.of(context).size.width,
-                                height: 250,
-                                fit: BoxFit.fill,
+                                width: message
+                                        .content?.photo?.minithumbnail?.width ??
+                                    MediaQuery.of(context).size.width,
+                                height: message.content?.photo?.minithumbnail
+                                        ?.height ??
+                                    250,
+                                fit: BoxFit.cover,
                               )
                             : Image.asset(
                                 imagesBox.brandLogoFull,
@@ -276,12 +299,16 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
                                 flex: 1,
                                 child: IconButton(
                                   onPressed: () {
-                                    videoDownload(message,
-                                        message.content?.video?.video?.id);
+                                    videoPath != ''
+                                        ? null
+                                        : videoDownload(message,
+                                            message.content?.video?.video?.id);
                                   },
                                   icon: videoDownloadedSize > 0 &&
                                           videoDownloadedSize < videoFileSize
-                                      ? CircularProgressIndicator()
+                                      ? updateFileId == videoFileId
+                                          ? Text(downloadSize)
+                                          : CircularProgressIndicator()
                                       : Icon(
                                           videoPath == ''
                                               ? CupertinoIcons
@@ -372,7 +399,7 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
       bucket: PageStorageBucket(),
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
-        height: 270.h,
+        height: MediaQuery.of(context).size.width,
         child: Column(
           children: [
             _buildPost(context, contentIndex, message),

@@ -76,10 +76,10 @@ class AndroidMainPageController extends GetxController
     // SuperGroupFullInfo superGroup = telegramDatas.superGroupFullInfoList[
     //     telegramDatas.chatHistoryVideos[0].senderId?.chatId];
     // print(superGroup.photo?.sizes?.first.photo?.id);
-    await telegramGetters.loadChats();
-    await loadChannels();
+    telegramGetters.loadChats();
+    loadChannels();
 
-    await loadChannels();
+    loadChannels();
     // // log(superGroupFullInfoToJson(telegramDatas.superGroupFullInfoList[0]));
     // print("Chat History Count: ${telegramDatas.chatHistory.value.totalCount}");
     // print("Chats Result Count: ${telegramDatas.chats.value.result!}");

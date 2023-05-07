@@ -146,6 +146,8 @@ class AndroidMainPage extends GetView<AndroidMainPageController> {
     final controller = Get.put(AndroidMainPageController());
     return Obx(
       () {
+        print(
+            "Chat History Total Count ${telegramDatas.chatHistory.value.totalCount}");
         controller.isProcessing.value
             ? showLoading()
             : EasyLoading.dismiss(animation: true);

@@ -1,488 +1,169 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:carousel_slider/carousel_slider.dart';
+import 'dart:io';
+
+import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:telefilm/common/class/telegram/chat/chat_histories/chat_history_class.dart'
+    as history;
 
-import '../../common/controller/functions/hide_and_show_app_bar_title.dart';
-import '../../common/style/color.dart';
+import '../../common/getter/getter.dart';
 import 'controller.dart';
 
 class AndroidContentInfoPage extends GetView<AndroidContentInfoPageController> {
   const AndroidContentInfoPage({
     Key? key,
   }) : super(key: key);
+  void videoDownload(history.Message message, int fileId) {
+    String path = message.content?.video?.video?.local?.path ?? '';
+    if (path == '') {
+      telegramGetters.getFile(
+        fileId,
+        1,
+        1,
+        0,
+        true,
+      );
+    }
+  }
 
-  SliverAppBar _buildAppBar(BuildContext context) {
+  Widget _buildVideoPlayerWidget(
+      BuildContext context, File video, history.Message message) {
+    double videoWith =
+        double.parse(message.content?.video?.width.toString() ?? '0');
+    double videoHeight =
+        double.parse(message.content?.video?.height.toString() ?? '0');
+    controller.setVideoController(video);
+    return SizedBox(
+        width: videoWith != 0 ? videoWith : MediaQuery.of(context).size.width,
+        height:
+            videoHeight != 0 ? videoHeight : MediaQuery.of(context).size.height,
+        child: Chewie(controller: controller.chewieController.value));
+  }
+
+  Widget _buildVideoContent(BuildContext context) {
     final data =
-        ModalRoute.of(context)?.settings.arguments as Map<String, String>;
+        ModalRoute.of(context)?.settings.arguments as Map<String, Object>;
+    history.Message message = data['message'] as history.Message;
     final controller = Get.put(AndroidContentInfoPageController());
-    controller.currentImageIndex.value = int.parse(data['imageIndex'] ?? "0");
-    return SliverAppBar(
-      // title: Text(
-      //   'Briggs',
-      //   style: GoogleFonts.abel(fontWeight: FontWeight.w500, fontSize: 25.sp),
-      // ),
-      title: SliverAppBarTitleStatus(
-        child: Text('Some Name'),
-      ),
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Get.theme.brightness == Brightness.light
-                ? AppColor.white
-                : AppColor.black,
-            foregroundColor: Get.theme.brightness == Brightness.light
-                ? AppColor.black
-                : AppColor.white,
+    final duration = Duration(seconds: message.content?.video?.duration)
+        .toString()
+        .split('.')[0]
+        .padLeft(8, '0');
+
+    const math = 0.00000095367432;
+    double bytes = message.content?.video?.video?.size * math;
+    final fileSize = bytes.roundToDouble().toString();
+    final photoPath =
+        message.content?.video?.thumbnail?.file?.local?.path ?? '';
+    final photoFile = File(photoPath);
+    final videoPath = message.content?.video?.video?.local?.path ?? '';
+    final videoFile = File(videoPath);
+    final videoFileId = message.content?.video?.video?.id;
+    final videoDownloadedSize =
+        message.content?.video?.video?.local?.downloadedSize ?? 0;
+    final videoFileSize = message.content?.video?.video?.size ?? 0;
+    final updateFileId = telegramDatas.updateFile.value.file?.id;
+    final downloadSize =
+        (telegramDatas.updateFile.value.file?.local?.downloadedSize ??
+                0.0 * math)
+            .roundToDouble()
+            .toString();
+    return Hero(
+      tag: "$data['heroTag']",
+      child: Stack(
+        alignment: AlignmentDirectional.bottomEnd,
+        children: [
+          Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            padding: const EdgeInsets.all(8.0),
-            fixedSize: Size(
-              25.w,
-              25.h,
-            ),
-            maximumSize: Size(
-              25.w,
-              25.h,
-            ),
-            minimumSize: Size(
-              25.w,
-              25.h,
-            ),
+            child: videoPath != ''
+                ? _buildVideoPlayerWidget(context, videoFile, message)
+                : photoFile.path != ''
+                    ? Image.file(
+                        photoFile,
+                        width: message.content?.photo?.minithumbnail?.width ??
+                            MediaQuery.of(context).size.width,
+                        height: message.content?.photo?.minithumbnail?.height ??
+                            MediaQuery.of(context).size.width,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.asset(
+                        imagesBox.brandLogoFull,
+                        width: MediaQuery.of(context).size.width,
+                        height: 250,
+                        fit: BoxFit.fill,
+                      ),
           ),
-          child: Center(
-            child: Icon(
-              CupertinoIcons.arrow_left,
-              color: Colors.transparent.withAlpha(150),
-              size: 22.w,
-            ),
-          ),
-        ),
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Get.theme.brightness == Brightness.light
-                  ? AppColor.white
-                  : AppColor.black,
-              foregroundColor: Get.theme.brightness == Brightness.light
-                  ? AppColor.black
-                  : AppColor.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.all(8.0),
-              fixedSize: Size(
-                35.w,
-                35.h,
-              ),
-              maximumSize: Size(
-                35.w,
-                35.h,
-              ),
-              minimumSize: Size(
-                35.w,
-                35.h,
-              ),
-            ),
-            child: Center(
-              child: Icon(
-                CupertinoIcons.search,
-                color: Colors.transparent.withAlpha(150),
-                size: 22.w,
-              ),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Get.theme.brightness == Brightness.light
-                  ? AppColor.white
-                  : AppColor.black,
-              foregroundColor: Get.theme.brightness == Brightness.light
-                  ? AppColor.black
-                  : AppColor.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.all(8.0),
-              fixedSize: Size(
-                35.w,
-                35.h,
-              ),
-              maximumSize: Size(
-                35.w,
-                35.h,
-              ),
-              minimumSize: Size(
-                35.w,
-                35.h,
-              ),
-            ),
-            child: Center(
-              child: Icon(
-                CupertinoIcons.share_up,
-                color: Colors.transparent.withAlpha(150),
-                size: 22.w,
-              ),
-            ),
-          ),
-        )
-      ],
-      expandedHeight: 300.0,
-      floating: false,
-      pinned: true,
-      snap: false,
-      elevation: 0,
-      // foregroundColor: AppColor.black,
-      // backgroundColor: Colors.white,
-      flexibleSpace: FlexibleSpaceBar(
-        centerTitle: true,
-        background: Hero(
-          tag: "${data['heroTag']}",
-          child: CarouselSlider.builder(
-            key: GlobalKey(),
-            itemCount: controller.imagePaths.length,
-            carouselController: controller.carouselController,
-            itemBuilder:
-                (BuildContext context, int itemIndex, int pageViewIndex) =>
-                    Image.asset(
-              controller.imagePaths[itemIndex],
-              width: MediaQuery.of(context).size.width,
-              height: 300,
-              fit: BoxFit.fill,
-            ),
-            options: CarouselOptions(
-              height: 300,
-              aspectRatio: 16 / 9,
-              viewportFraction: 1,
-              initialPage: int.parse(data['imageIndex'] ?? "0"),
-              enableInfiniteScroll: true,
-              reverse: false,
-              autoPlay: false,
-              autoPlayInterval: Duration(seconds: 3),
-              autoPlayAnimationDuration: Duration(milliseconds: 800),
-              autoPlayCurve: Curves.fastOutSlowIn,
-              enlargeCenterPage: true,
-              enlargeFactor: 0.3,
-              onPageChanged: (index, value) {
-                // controller.currentImageIndexList[index] = index;
-              },
-              scrollDirection: Axis.horizontal,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNameContent() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Briggs',
-              style: GoogleFonts.abel(
-                  fontWeight: FontWeight.w500, fontSize: 25.sp),
-            ),
-            Text(
-              'Кроссовки',
-              style: GoogleFonts.abel(fontSize: 18.sp),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriceContent() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              '15 000.00',
-              style: GoogleFonts.abel(
-                  fontWeight: FontWeight.bold, fontSize: 20.sp),
-            ),
-            Text(
-              'сум',
-              style: GoogleFonts.abel(fontSize: 15.sp),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSizeContent(context) {
-    return SliverToBoxAdapter(
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: SizedBox(
-          height: 60.h,
-          width: MediaQuery.of(context).size.width - 5,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(flex: 1, child: Text("RUS")),
-                Expanded(
-                  flex: 7,
-                  child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: controller.sizes.length,
-                      itemBuilder: (context, index) {
-                        return Obx(() {
-                          return GestureDetector(
-                            onTap: () {
-                              controller.selectedSizeIndex.value = index;
-                            },
-                            child: SizedBox(
-                              width: 60,
-                              height: 60,
-                              child: Card(
-                                elevation: 3.0,
-                                color: Get.theme.brightness == Brightness.light
-                                    ? controller.selectedSizeIndex.value ==
-                                            index
-                                        ? AppColor.black
-                                        : AppColor.white
-                                    : controller.selectedSizeIndex.value ==
-                                            index
-                                        ? AppColor.white
-                                        : AppColor.black,
-                                child: Center(
-                                  child: Text(
-                                    controller.sizes[index].toString(),
-                                    style: TextStyle(
-                                      color: Get.theme.brightness ==
-                                              Brightness.light
-                                          ? controller.selectedSizeIndex
-                                                      .value ==
-                                                  index
-                                              ? AppColor.white
-                                              : AppColor.black
-                                          : controller.selectedSizeIndex
-                                                      .value ==
-                                                  index
-                                              ? AppColor.black
-                                              : AppColor.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        });
-                      }),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLinkToSizesTableContent() {
-    return SliverToBoxAdapter(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          TextButton(
-            onPressed: () {},
-            child: Text(
-              'Sizes Table',
-              style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
-              textAlign: TextAlign.start,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAddToBasketButton(BuildContext context) {
-    return Padding(
-      padding:
-          const EdgeInsets.only(right: 8.0, left: 8.0, bottom: 10.0, top: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Get.theme.brightness == Brightness.light
-                    ? AppColor.black
-                    : AppColor.white,
-                foregroundColor: Get.theme.brightness == Brightness.dark
-                    ? AppColor.white
-                    : AppColor.black,
-                maximumSize:
-                    Size(MediaQuery.of(context).size.width - 70.w, 40.h),
-                fixedSize: Size(MediaQuery.of(context).size.width - 70.w, 40.h),
-                minimumSize:
-                    Size(MediaQuery.of(context).size.width - 70.w, 40.h)),
-            onPressed: () {},
-            child: Text(
-              'Add to basket',
-              style: TextStyle(
-                color: Get.theme.brightness == Brightness.light
-                    ? AppColor.white
-                    : AppColor.black,
-                fontSize: 18.sp,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Get.theme.brightness == Brightness.light
-                    ? AppColor.black
-                    : AppColor.white,
-                foregroundColor: Get.theme.brightness == Brightness.dark
-                    ? AppColor.white
-                    : AppColor.black,
-                maximumSize: Size(50.w, 40.h),
-                fixedSize: Size(50.w, 40.h),
-                minimumSize: Size(50.w, 40.h)),
-            onPressed: () {},
-            child: Icon(
-              Icons.favorite_border,
-              color: Get.theme.brightness == Brightness.light
-                  ? AppColor.white
-                  : AppColor.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAddToFavoriteAndShareButtons() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SizedBox(
-          height: 40.h,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Expanded(
-                child: InkWell(
-                  onTap: () {},
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          CupertinoIcons.heart,
-                          size: 25.sp,
-                        ),
-                        Text(
-                          'Add to Favorite',
-                          style: TextStyle(fontSize: 18.sp),
-                        ),
-                      ],
+          videoPath != ''
+              ? Container()
+              : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white30,
                     ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: InkWell(
-                  onTap: () {},
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    width: 120.w,
+                    height: 40.h,
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 5.0.w),
-                          child: Icon(
-                            CupertinoIcons.share_up,
-                            size: 25.sp,
+                        Expanded(
+                          flex: 1,
+                          child: IconButton(
+                            onPressed: () {
+                              videoPath != ''
+                                  ? null
+                                  : videoDownload(message,
+                                      message.content?.video?.video?.id);
+                            },
+                            icon: videoDownloadedSize > 0 &&
+                                    videoDownloadedSize < videoFileSize
+                                ? updateFileId == videoFileId
+                                    ? Text(downloadSize)
+                                    : CircularProgressIndicator()
+                                : Icon(
+                                    videoPath == ''
+                                        ? CupertinoIcons.cloud_download_fill
+                                        : CupertinoIcons.play_fill,
+                                  ),
                           ),
                         ),
-                        Text(
-                          'Share',
-                          style: TextStyle(fontSize: 18.sp),
+                        VerticalDivider(),
+                        Expanded(
+                          flex: 2,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(duration),
+                                Text("$fileSize MB"),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              )
-            ],
-          ),
-        ),
+                )
+        ],
       ),
     );
   }
 
-  Widget _buildTextForGetCity() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SizedBox(
-          height: 40.h,
-          child: RichText(
-            text: TextSpan(
-              text: 'Set your city for taxi.',
-              style: TextStyle(color: Colors.black, fontSize: 18),
-              children: <TextSpan>[
-                TextSpan(
-                    text: ' Get city',
-                    style: TextStyle(color: Colors.blueAccent, fontSize: 18),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        // navigate to desired screen
-                      })
-              ],
-            ),
-          ),
-        ),
-      ),
+  Widget _buildContent(BuildContext context) {
+    return Column(
+      children: [_buildVideoContent(context)],
     );
   }
 
-  Widget _buildScrollView(BuildContext context) {
-    final controller = Get.put(AndroidContentInfoPageController());
-    return CustomScrollView(
-      controller: controller.scrollController,
-      physics: BouncingScrollPhysics(),
-      slivers: [
-        _buildAppBar(context),
-        _buildNameContent(),
-        _buildPriceContent(),
-        _buildSizeContent(context),
-        _buildLinkToSizesTableContent(),
-        _buildAddToFavoriteAndShareButtons(),
-        _buildTextForGetCity(),
-      ],
-    );
+  AppBar _buildAppBar() {
+    return AppBar();
   }
 
   @override
@@ -490,8 +171,8 @@ class AndroidContentInfoPage extends GetView<AndroidContentInfoPageController> {
     // final data = Get.arguments;
 
     return Scaffold(
-      body: SafeArea(child: _buildScrollView(context)),
-      bottomSheet: _buildAddToBasketButton(context),
+      appBar: _buildAppBar(),
+      body: SafeArea(child: _buildContent(context)),
     );
   }
 }
