@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +13,10 @@ class AndroidGeneralPageController extends GetxController
   final isProcessing = false.obs;
   RxInt currentImageIndex = 0.obs;
   List currentImageIndexList = [].obs;
+  Rx<File> photo = File('').obs;
+  Rx<File> video = File('').obs;
+  RxList<File> post = <File>[].obs;
+
   final CarouselController carouselController = CarouselController();
   final scrollController = ScrollController();
   List imagePaths = [

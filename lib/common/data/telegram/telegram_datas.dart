@@ -1,16 +1,26 @@
 import 'package:get/get.dart';
-import 'package:telefilm/common/class/telegram/chat/chat_history_class.dart';
+import 'package:telefilm/common/class/telegram/chat/chat_histories/chat_history_class.dart';
+import 'package:telefilm/common/class/telegram/chat/chat_histories/person_chat_history_class.dart'
+    as person;
+import 'package:telefilm/common/class/telegram/chat/download_file_class.dart';
+import 'package:telefilm/common/class/telegram/chat/super_group_full_info_class.dart';
+import 'package:telefilm/common/class/telegram/chat/update_file.dart';
 
 import '../../class/telegram/chats.dart' as chat;
 import '../../class/telegram/countries.dart';
 import '../../class/telegram/selected_country.dart';
-import '../../class/telegram/user_datas.dart' as user;
 import '../../class/telegram/verify_phone_number_data.dart';
 
 class TelegramDatas extends GetxController {
   Rx<Countries> countries = Countries(type: '', countries: []).obs;
   Rx<ChatHistory> chatHistory = ChatHistory().obs;
-  Rx<Iterable<Message>> chatHistoryVideos = const Iterable<Message>.empty().obs;
+  Rx<person.PersonChatHistory> personChatHistory =
+      person.PersonChatHistory().obs;
+  Rx<DownloadFile> downloadFile = DownloadFile().obs;
+  Rx<UpdateFile> updateFile = UpdateFile().obs;
+  Rx<SuperGroupFullInfo> superGroupFullInfo = SuperGroupFullInfo().obs;
+  List<SuperGroupFullInfo> superGroupFullInfoList = <SuperGroupFullInfo>[].obs;
+  RxList<Message> chatHistoryVideos = <Message>[].obs;
   Rx<ThisCountry> thisCountry = ThisCountry(
       type: '',
       countryCode: '',
@@ -19,17 +29,19 @@ class TelegramDatas extends GetxController {
       isHidden: false,
       callingCodes: ['code'.tr]).obs;
   Rx<VerifyPhoneNumberData> verifyPhoneNumberData = VerifyPhoneNumberData(
-          type: '',
-          authorizationState: AuthorizationState(
-              type: '',
-              codeInfo: CodeInfo(
-                  type: '',
-                  phoneNumber: '',
-                  codeInfoType: Type(type: '', length: 0),
-                  timeout: 0)))
-      .obs;
+    type: '',
+    authorizationState: AuthorizationState(
+      type: '',
+      codeInfo: CodeInfo(
+        type: '',
+        phoneNumber: '',
+        codeInfoType: Type(type: '', length: 0),
+        timeout: 0,
+      ),
+    ),
+  ).obs;
   Rx<chat.Chats> chats = chat.Chats(ok: true, result: []).obs;
-  List<user.User> channels = <user.User>[].obs;
+  List<chat.Result> channels = <chat.Result>[].obs;
   List<ChatHistory> chatHistoryList = <ChatHistory>[].obs;
   List masks = [
     {

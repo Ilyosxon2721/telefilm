@@ -2,10 +2,13 @@
 
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:telefilm/common/class/telegram/chat/chat_history_class.dart';
+import 'package:telefilm/common/class/telegram/chat/chat_histories/chat_history_class.dart';
+import 'package:telefilm/common/class/telegram/chat/download_file_class.dart';
+import 'package:telefilm/common/class/telegram/chat/super_group_full_info_class.dart';
 import 'package:telegram_client/tdlib/tdlib.dart';
 
 import '../../class/telegram/chats.dart';
@@ -115,9 +118,184 @@ class TelegramGetters extends GetxController {
         .then((value) async {
       if (value.isNotEmpty) {
         final json = jsonEncode(value);
+        // log(json);
         try {
           Chats chats = chatsFromJson(json);
           telegramDatas.chats.value = chats;
+        } catch (e) {
+          print("Error Load Chats $e");
+        }
+      }
+    }).catchError((onError) {
+      print("Error $onError");
+    });
+  }
+
+  Future<void> getUser(int userId) async {
+    await tg
+        .request(
+      "getUser",
+      parameters: {
+        "user_id": userId,
+      },
+      clientId: tg.client_id,
+      isVoid: true,
+      extra: 'getUser',
+    )
+        .then((value) async {
+      if (value.isNotEmpty) {
+        final json = jsonEncode(value);
+        log(json);
+        // try {
+        //   Chats chats = chatsFromJson(json);
+        //   telegramDatas.chats.value = chats;
+        // } catch (e) {
+        //   print("EEEEEEEEEEEEEEEE $e");
+        // }
+      }
+    }).catchError((onError) {
+      print("Error $onError");
+    });
+  }
+
+  Future<void> getMe() async {
+    await tg
+        .request(
+      "getMe",
+      parameters: {},
+      clientId: tg.client_id,
+      isVoid: true,
+      extra: 'getMe',
+    )
+        .then((value) async {
+      if (value.isNotEmpty) {
+        final json = jsonEncode(value);
+        log(json);
+        // try {
+        //   Chats chats = chatsFromJson(json);
+        //   telegramDatas.chats.value = chats;
+        // } catch (e) {
+        //   print("EEEEEEEEEEEEEEEE $e");
+        // }
+      }
+    }).catchError((onError) {
+      print("Error $onError");
+    });
+  }
+
+  Future<void> getUserProfilePhotos(int userId, int offset, int limit) async {
+    await tg
+        .request(
+      "getUserProfilePhotos",
+      parameters: {
+        "user_id": userId,
+        "offset": offset,
+        "limit": limit,
+      },
+      clientId: tg.client_id,
+      isVoid: true,
+      extra: 'getUserProfilePhotos',
+    )
+        .then((value) async {
+      if (value.isNotEmpty) {
+        final json = jsonEncode(value);
+        log(json);
+        // try {
+        //   Chats chats = chatsFromJson(json);
+        //   telegramDatas.chats.value = chats;
+        // } catch (e) {
+        //   print("EEEEEEEEEEEEEEEE $e");
+        // }
+      }
+    }).catchError((onError) {
+      print("Error $onError");
+    });
+  }
+
+  Future<void> getSupergroupFullInfo(int supergroupId) async {
+    await tg
+        .request(
+      "getSupergroupFullInfo",
+      parameters: {
+        "supergroup_id": supergroupId,
+      },
+      clientId: tg.client_id,
+      isVoid: true,
+      extra: 'getSupergroupFullInfo',
+    )
+        .then((value) async {
+      if (value.isNotEmpty) {
+        final json = jsonEncode(value);
+        log(json);
+        try {
+          SuperGroupFullInfo superGroupFullInfo =
+              superGroupFullInfoFromJson(json);
+          telegramDatas.superGroupFullInfo.value = superGroupFullInfo;
+        } catch (e) {
+          print("Error ${e.reactive}");
+        }
+      }
+    }).catchError((onError) {
+      print("Error $onError");
+    });
+  }
+
+  Future<void> getChat(int chatId) async {
+    await tg
+        .request(
+      "getChat",
+      parameters: {
+        "chat_id": chatId,
+      },
+      clientId: tg.client_id,
+      isVoid: true,
+      extra: 'getChat',
+    )
+        .then((value) async {
+      if (value.isNotEmpty) {
+        final json = jsonEncode(value);
+        log(json);
+        // try {
+        //   Chats chats = chatsFromJson(json);
+        //   telegramDatas.chats.value = chats;
+        // } catch (e) {
+        //   print("EEEEEEEEEEEEEEEE $e");
+        // }
+      }
+    }).catchError((onError) {
+      print("Error $onError");
+    });
+  }
+
+  Future<DownloadFile> downloadFile(
+    int fileId,
+    int priority,
+    int offset,
+    int limit,
+    bool synchronous,
+  ) async {
+    await tg
+        .request(
+      "downloadFile",
+      parameters: {
+        "file_id": fileId,
+        "priority": priority,
+        "offset": offset,
+        "limit": limit,
+        "synchronous": synchronous,
+      },
+      clientId: tg.client_id,
+      isVoid: true,
+      extra: 'downloadFile',
+    )
+        .then((value) async {
+      if (value.isNotEmpty) {
+        final json = jsonEncode(value);
+        log(json);
+        try {
+          DownloadFile downloadFile = downloadFileFromJson(json);
+          telegramDatas.downloadFile.value = downloadFile;
+          return downloadFile;
         } catch (e) {
           print("EEEEEEEEEEEEEEEE $e");
         }
@@ -125,6 +303,23 @@ class TelegramGetters extends GetxController {
     }).catchError((onError) {
       print("Error $onError");
     });
+    return telegramDatas.downloadFile.value;
+  }
+
+  Future<File> getFile(
+    int fileId,
+    int priority,
+    int offset,
+    int limit,
+    bool synchronous,
+  ) async {
+    // File result = File(
+    //     '/data/data/app.telefilm.org.telefilm/files/photos/5377749695901845792_97.jpg');
+    DownloadFile downloadResult =
+        await downloadFile(fileId, priority, offset, limit, synchronous);
+
+    File result = File(downloadResult.local?.path ?? '');
+    return result;
   }
 
   Future<void> getChatListsToAddChat(int chatId) async {
@@ -140,22 +335,15 @@ class TelegramGetters extends GetxController {
     )
         .then((value) async {
       if (value.isNotEmpty) {
-        // final json = jsonEncode(value);
-        print(value);
-        // try {
-        //   Chats chats = chatsFromJson(json);
-        //   telegramDatas.chats.value = chats;
-        //   print('Resultss ${chats.result}');
-        // } catch (e) {
-        //   print("EEEEEEEEEEEEEEEE $e");
-        // }
+        final json = jsonEncode(value);
+        log(json);
       }
     }).catchError((onError) {
       print("Error $onError");
     });
   }
 
-  Future<void> getChatHistory(
+  Future<ChatHistory> getChatHistory(
     int chatId,
     int fromMessageId,
     int offset,
@@ -179,22 +367,26 @@ class TelegramGetters extends GetxController {
         .then((value) async {
       if (value.isNotEmpty) {
         final json = jsonEncode(value);
-        // print(json);
         log(json);
-
         try {
           ChatHistory chatHistory = chatHistoryFromJson(json);
           telegramDatas.chatHistory.value = chatHistory;
-          telegramDatas.chatHistoryVideos.value = chatHistory.messages?.where(
-                  (element) => element.content?.type == "messageVideo") ??
-              const Iterable.empty();
+          List<Message> list = chatHistory.messages
+                  ?.where((element) => element.content?.type == "messageVideo")
+                  .toList() ??
+              [];
+          for (var i = 0; i < list.length; i++) {
+            print('History list count $i');
+            telegramDatas.chatHistoryVideos.add(list[i]);
+          }
         } catch (e) {
-          print("EEEEEEEEEEEEEEEE $e");
+          print("Error Chat History $e");
         }
       }
     }).catchError((onError) {
       print("Error $onError");
     });
+    return telegramDatas.chatHistory.value;
   }
 
   Future<void> getChatStatistics(

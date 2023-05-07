@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:telefilm/common/class/telegram/chat/download_file_class.dart';
 
 import '../api/data/user/user_datas.dart';
 import '../api/service/services.dart';
@@ -16,6 +17,7 @@ ApiService apiService = Get.put(ApiService());
 GlobalLoginController globalLoginController = Get.put(GlobalLoginController());
 UserDatasController userDatasController = Get.put(UserDatasController());
 TelegramDatas telegramDatas = Get.put(TelegramDatas());
+DownloadFile downloadFile = Get.put(DownloadFile());
 TelegramGetters telegramGetters = Get.put(TelegramGetters());
 TelegramSend telegramSend = Get.put(TelegramSend());
 Functions functions = Get.put(Functions());

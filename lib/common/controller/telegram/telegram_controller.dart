@@ -5,6 +5,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:telefilm/common/class/telegram/chat/update_file.dart';
+import 'package:telefilm/common/getter/getter.dart';
 import 'package:telegram_client/telegram_client.dart';
 
 import '../../class/telegram/author_state.dart';
@@ -17,6 +19,7 @@ class UpdateOptionState {
   static const updateOption = 'updateOption';
   static const updateAuthState = 'updateAuthorizationState';
   static const updateUser = 'updateUser';
+  static const updateFile = 'updateFile';
   static const authentication_token = 'authentication_token';
   static const authorization_date = 'authorization_date';
   static const my_id = 'my_id';
@@ -102,6 +105,12 @@ class TelegramController extends GetxController {
     final json = jsonEncode(value);
   }
 
+  void updateFile(Map<dynamic, dynamic> value, UpdateTd updateTd) {
+    final json = jsonEncode(value);
+    UpdateFile updateFile = updateFileFromJson(json);
+    telegramDatas.updateFile.value = updateFile;
+  }
+
   dynamic callback(UpdateTd updateTd) async {
     Future(() async {
       if (kDebugMode) {
@@ -117,6 +126,9 @@ class TelegramController extends GetxController {
           break;
         case UpdateOptionState.updateUser:
           updateUser(updateTd.raw, updateTd);
+          break;
+        case UpdateOptionState.updateFile:
+          updateFile(updateTd.raw, updateTd);
           break;
       }
       // final authorizationState = updateTd.raw["authorization_state"] ?? '';

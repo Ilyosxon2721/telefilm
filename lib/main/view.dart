@@ -8,10 +8,10 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:telefilm/common/getter/getter.dart';
-import 'package:telefilm/main/general/index.dart';
 
+import '../common/getter/getter.dart';
 import '../common/style/color.dart';
+import 'general/view.dart';
 import 'index.dart';
 
 class AndroidMainPage extends GetView<AndroidMainPageController> {
@@ -20,12 +20,11 @@ class AndroidMainPage extends GetView<AndroidMainPageController> {
     final controller = Get.put(AndroidMainPageController());
     controller.isProcessing.value = true;
 
-    Timer(const Duration(milliseconds: 250),
-        () {
-          controller.getContent();
+    Timer(const Duration(milliseconds: 250), () {
+      controller.getContent();
 
-          controller.isProcessing.value = false;
-        });
+      controller.isProcessing.value = false;
+    });
   }
 
   Future<void> showLoading() {
@@ -71,30 +70,9 @@ class AndroidMainPage extends GetView<AndroidMainPageController> {
     return SliverAppBar(
       title: InkWell(
         onTap: () {
+          // String val = "-1001628060608";
+          // print(val.substring(4));
           controller.getContent();
-          controller.dispose();
-          // print("Resultat -> ${telegramDatas.chats.value.result?[0].id}");
-          // print(telegramDatas.chatHistory.value.messages!.length);
-          // for (var i = 0;
-          //     i < telegramDatas.chatHistory.value.messages!.length;
-          //     i++) {
-          //   print(
-          //       "Type -> ${telegramDatas.chatHistory.value.messages![i].content!.type}");
-          //   print(
-          //       "Label -> ${telegramDatas.chatHistory.value.messages![i].content!.caption!.text}");
-          //   print(
-          //       "Photo Data -> ${telegramDatas.chatHistory.value.messages![i].content!.photo?.minithumbnail?.data}");
-          //   print(
-          //       "Text -> ${telegramDatas.chatHistory.value.messages![i].content!.text}");
-          //   print(
-          //       "Title -> ${telegramDatas.chatHistory.value.messages![i].content!.title}");
-          //   print(
-          //       "Video Data -> ${telegramDatas.chatHistory.value.messages![i].content!.video?.minithumbnail?.data}");
-          //   print(
-          //       "forwardCount -> ${telegramDatas.chatHistory.value.messages![i].interactionInfo?.forwardCount ?? 0}");
-          // }
-
-          // telegramGetters.getChatStatistics(-1001785447632, true);
         },
         child: Text(
           "TeleFilm",
@@ -104,7 +82,6 @@ class AndroidMainPage extends GetView<AndroidMainPageController> {
           ),
         ),
       ),
-
       actions: [
         Padding(
           padding: EdgeInsets.only(top: 8.0.h, bottom: 8.0.h, left: 8.0.w),
@@ -162,98 +139,6 @@ class AndroidMainPage extends GetView<AndroidMainPageController> {
         )
       ],
       elevation: 0,
-      // foregroundColor: AppColor.black,
-      // backgroundColor: Colors.white,
-      // flexibleSpace: FlexibleSpaceBar(
-      //   centerTitle: true,
-      //   title: Padding(
-      //     padding: EdgeInsets.only(left: 8.0.w, right: 8.0.w, bottom: 30.0.h),
-      //     child: TextFormField(
-      //       controller: controller.searchInputController,
-      //       decoration: InputDecoration(
-      //         border: OutlineInputBorder(
-      //             borderSide: BorderSide.none,
-      //             borderRadius: BorderRadius.circular(8)),
-      //         labelStyle: TextStyle(
-      //           color: Get.theme.brightness == Brightness.light
-      //               ? AppColor.lightInputLabelColor
-      //               : AppColor.darkInputLabelColor,
-      //           fontSize: 12.sp,
-      //         ),
-      //         hintStyle: TextStyle(
-      //           color: Get.theme.brightness == Brightness.light
-      //               ? AppColor.lightInputLabelColor
-      //               : AppColor.darkInputLabelColor,
-      //           fontSize: 12.sp,
-      //         ),
-      //         prefixIconColor: Get.theme.brightness == Brightness.light
-      //             ? AppColor.lightInputIconColor
-      //             : AppColor.darkInputIconColor,
-      //         suffixIconColor: Get.theme.brightness == Brightness.light
-      //             ? AppColor.lightInputIconColor
-      //             : AppColor.darkInputIconColor,
-      //         isCollapsed: true,
-      //         isDense: true,
-      //         contentPadding:
-      //             EdgeInsets.symmetric(horizontal: 0, vertical: 5.h),
-      //
-      //         // label: Text('Tovar, Brand or articul'),
-      //         alignLabelWithHint: true,
-      //         hintText: 'Tovar, Brand or articul',
-      //         filled: true,
-      //         prefixIconConstraints: BoxConstraints(
-      //           minWidth: 30,
-      //           minHeight: 30,
-      //           maxWidth: 50,
-      //           maxHeight: 50,
-      //         ),
-      //         prefixIcon: Icon(
-      //           CupertinoIcons.search,
-      //           size: 15,
-      //         ),
-      //         suffixIcon: Icon(
-      //           CupertinoIcons.camera_viewfinder,
-      //           size: 15,
-      //         ),
-      //         suffixIconConstraints: BoxConstraints(
-      //           minWidth: 30,
-      //           minHeight: 30,
-      //           maxWidth: 50,
-      //           maxHeight: 50,
-      //         ),
-      //         // isDense: true,
-      //         // contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-      //       ),
-      //     ),
-      //   ),
-      // ),
-      // bottom: PreferredSize(
-      //   preferredSize: Size.fromHeight(50.h),
-      //   child: Padding(
-      //     padding: EdgeInsets.only(right: 8.0.w, left: 8.0.w),
-      //     child: Container(
-      //       height: 35.h,
-      //       decoration: BoxDecoration(
-      //         color: Get.theme.brightness == Brightness.dark
-      //             ? Colors.white12
-      //             : Colors.black12,
-      //         borderRadius: BorderRadius.circular(
-      //           10.0,
-      //         ),
-      //       ),
-      //       child: TabBar(
-      //         onTap: (index) {
-      //           controller.currentTabIndex.value = index;
-      //         },
-      //         isScrollable: false,
-      //         physics: const BouncingScrollPhysics(),
-      //         padding: EdgeInsets.all(5.0),
-      //         controller: controller.tabController.value,
-      //         tabs: controller.tabs,
-      //       ),
-      //     ),
-      //   ),
-      // ),
     );
   }
 
@@ -275,7 +160,8 @@ class AndroidMainPage extends GetView<AndroidMainPageController> {
             slivers: [
               _buildAppBar(),
               telegramDatas.chatHistory.value.totalCount != null &&
-                      telegramDatas.chatHistory.value.totalCount != 0
+                      telegramDatas.chatHistory.value.totalCount != 0 &&
+                      telegramDatas.chats.value.result!.isNotEmpty
                   ? AndroidGeneralPage()
                   : SliverToBoxAdapter(
                       child: Center(
