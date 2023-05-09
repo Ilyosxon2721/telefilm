@@ -36,44 +36,44 @@ class AndroidProfilePageController extends GetxController
     }
   }
 
-  Future<void> loadChannels(Chats chats) async {
-    List<Result>? channels =
-        chats.result?.where((element) => element.type == Type.CHANNEL).toList();
-    // List<Result>? channels = telegramDatas.chats.value.result
-    //     ?.where((element) => element.type == Type.CHANNEL)
-    //     .toList();
-    telegramDatas.channels = channels ?? [];
-    int channelLength = channels!.length;
-    telegramDatas.superGroupFullInfoList.clear();
-    for (var i = 0; i < channelLength; i++) {
-      await telegramGetters
-          .getSupergroupFullInfo(
-        int.parse(
-          channels[i].id.toString().substring(4),
-        ),
-      )
-          .then((value) async {
-        telegramDatas.superGroupFullInfoList
-            .add(telegramDatas.superGroupFullInfo.value);
-        int photoId = telegramDatas
-                .superGroupFullInfo.value.photo?.sizes?.first.photo?.id ??
-            0;
-        String path = telegramDatas.superGroupFullInfo.value.photo?.sizes?.first
-                .photo?.local?.path ??
-            '';
-        if (photoId != 0 && path != '') {
-          await telegramGetters.getFile(
-            photoId,
-            1,
-            1,
-            0,
-            true,
-          );
-        }
-      });
-    }
-    await loadChannelHistory(channels);
-  }
+  // Future<void> loadChannels(Chats chats) async {
+  //   List<Result>? channels =
+  //       chats.result?.where((element) => element.type == Type.CHANNEL).toList();
+  //   // List<Result>? channels = telegramDatas.chats.value.result
+  //   //     ?.where((element) => element.type == Type.CHANNEL)
+  //   //     .toList();
+  //   telegramDatas.channels = channels ?? [];
+  //   int channelLength = channels!.length;
+  //   telegramDatas.superGroupFullInfoList.clear();
+  //   for (var i = 0; i < channelLength; i++) {
+  //     await telegramGetters
+  //         .getSupergroupFullInfo(
+  //       int.parse(
+  //         channels[i].id.toString().substring(4),
+  //       ),
+  //     )
+  //         .then((value) async {
+  //       telegramDatas.superGroupFullInfoList
+  //           .add(telegramDatas.superGroupFullInfo.value);
+  //       int photoId = telegramDatas
+  //               .superGroupFullInfo.value.photo?.sizes?.first.photo?.id ??
+  //           0;
+  //       String path = telegramDatas.superGroupFullInfo.value.photo?.sizes?.first
+  //               .photo?.local?.path ??
+  //           '';
+  //       if (photoId != 0 && path != '') {
+  //         await telegramGetters.getFile(
+  //           photoId,
+  //           1,
+  //           1,
+  //           0,
+  //           true,
+  //         );
+  //       }
+  //     });
+  //   }
+  //   await loadChannelHistory(channels);
+  // }
 
   Future<void> getContent() async {
     // loadChannels();

@@ -6,7 +6,6 @@ import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:telefilm/common/class/telegram/chat/chat_histories/chat_history_class.dart';
-import 'package:telefilm/common/class/telegram/chat/chat_histories/video_messages.dart';
 import 'package:telefilm/common/class/telegram/chat/download_file_class.dart';
 import 'package:telefilm/common/class/telegram/chat/super_group_full_info_class.dart';
 import 'package:telegram_client/tdlib/tdlib.dart';
@@ -376,36 +375,6 @@ class TelegramGetters extends GetxController {
         try {
           ChatHistory chatHistory = chatHistoryFromJson(json);
           telegramDatas.chatHistory.value = chatHistory;
-          List<Message> list = chatHistory.messages
-                  ?.where((element) => element.content?.type == "messageVideo")
-                  .toList() ??
-              [];
-          // groupInfo = telegramDatas.superGroupFullInfoList.where((element) => element.reactive.)
-
-          for (var i = 0; i < list.length; i++) {
-            print('History list count $i');
-            final groupId = list[i].chatId;
-            await telegramGetters.getSupergroupFullInfo(int.parse(
-              groupId.toString().substring(4),
-            ));
-            telegramDatas.superGroupFullInfo.listen((callback) {
-              List<VideoMessages> isEqual = telegramDatas.videoMessages
-                  .where((element) => element.message.id = list[i].id)
-                  .toList();
-              print("VideoMessages List ${isEqual.isEmpty} ");
-              isEqual.isEmpty
-                  ? telegramDatas.videoMessages
-                      .add(VideoMessages(i, callback, list[i]))
-                  : null;
-            });
-            List<Message> isEqual = telegramDatas.chatHistoryVideos
-                .where((element) => identical(element, list[i]))
-                .toList();
-            print("Message List $isEqual ");
-            isEqual.isEmpty
-                ? telegramDatas.chatHistoryVideos.add(list[i])
-                : null;
-          }
         } catch (e) {
           print("Error Chat History $e");
         }

@@ -1,12 +1,16 @@
 import 'package:get/get.dart';
+import 'package:telefilm/common/class/telegram/chat/channel_class.dart';
+import 'package:telefilm/common/class/telegram/chat/chat_histories/bots_class.dart';
 import 'package:telefilm/common/class/telegram/chat/chat_histories/chat_history_class.dart';
 import 'package:telefilm/common/class/telegram/chat/chat_histories/person_chat_history_class.dart'
     as person;
 import 'package:telefilm/common/class/telegram/chat/chat_histories/video_messages.dart';
 import 'package:telefilm/common/class/telegram/chat/download_file_class.dart';
+import 'package:telefilm/common/class/telegram/chat/super_group_class.dart';
 import 'package:telefilm/common/class/telegram/chat/super_group_full_info_class.dart';
 import 'package:telefilm/common/class/telegram/chat/update_file.dart';
 
+import '../../class/telegram/chat/private_chats_class.dart';
 import '../../class/telegram/chats.dart' as chat;
 import '../../class/telegram/countries.dart';
 import '../../class/telegram/selected_country.dart';
@@ -14,15 +18,33 @@ import '../../class/telegram/verify_phone_number_data.dart';
 
 class TelegramDatas extends GetxController {
   Rx<Countries> countries = Countries(type: '', countries: []).obs;
+  Rx<chat.Chats> chats = chat.Chats(ok: true, result: []).obs;
   Rx<ChatHistory> chatHistory = ChatHistory().obs;
   Rx<person.PersonChatHistory> personChatHistory =
       person.PersonChatHistory().obs;
   Rx<DownloadFile> downloadFile = DownloadFile().obs;
   Rx<UpdateFile> updateFile = UpdateFile().obs;
   Rx<SuperGroupFullInfo> superGroupFullInfo = SuperGroupFullInfo().obs;
-  List<SuperGroupFullInfo> superGroupFullInfoList = <SuperGroupFullInfo>[].obs;
+  Rx<Channel> chanel = Channel().obs;
+  Rx<SuperGroup> superGroup = SuperGroup().obs;
+  Rx<PrivateChats> privateChats = PrivateChats().obs;
+  Rx<Bots> bots = Bots().obs;
+
+  //lists
+  RxList<SuperGroupFullInfo> superGroupFullInfoList =
+      <SuperGroupFullInfo>[].obs;
   RxList<Message> chatHistoryVideos = <Message>[].obs;
   RxList<VideoMessages> videoMessages = <VideoMessages>[].obs;
+  RxList<Channel> channelList = <Channel>[].obs;
+  RxList<SuperGroup> superGroupList = <SuperGroup>[].obs;
+  RxList<PrivateChats> privateChatsList = <PrivateChats>[].obs;
+  RxList<Bots> botsList = <Bots>[].obs;
+  RxList<chat.Result> channels = <chat.Result>[].obs;
+  RxList<ChatHistory> chatHistoryList = <ChatHistory>[].obs;
+  RxList<ChatHistory> chatHistoryListFromBots = <ChatHistory>[].obs;
+  RxList<ChatHistory> chatHistoryListFromChannels = <ChatHistory>[].obs;
+  RxList<ChatHistory> chatHistoryListFromPrivates = <ChatHistory>[].obs;
+  RxList<ChatHistory> chatHistoryListFromSuperGroups = <ChatHistory>[].obs;
   Rx<ThisCountry> thisCountry = ThisCountry(
       type: '',
       countryCode: '',
@@ -42,9 +64,7 @@ class TelegramDatas extends GetxController {
       ),
     ),
   ).obs;
-  Rx<chat.Chats> chats = chat.Chats(ok: true, result: []).obs;
-  List<chat.Result> channels = <chat.Result>[].obs;
-  List<ChatHistory> chatHistoryList = <ChatHistory>[].obs;
+
   List masks = [
     {
       "AD": "000 00 00 00",
