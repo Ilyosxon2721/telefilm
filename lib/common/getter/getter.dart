@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:telefilm/common/class/telegram/chat/download_file_class.dart';
+import 'package:telefilm/common/controller/progres_controllers/telegram_progress.dart';
 
 import '../api/data/user/user_datas.dart';
 import '../api/service/services.dart';
@@ -24,3 +25,4 @@ Functions functions = Get.put(Functions());
 PinPutThemes pinPutThemes = Get.put(PinPutThemes());
 BottomNavBarControllerClass bottomNavBarControllerClass =
     Get.put(BottomNavBarControllerClass());
+TelegramProgress telegramProgress = Get.put(TelegramProgress());

@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:telefilm/common/class/telegram/chat/chat_histories/chat_history_class.dart';
 import 'package:telefilm/common/class/telegram/chat/chat_histories/person_chat_history_class.dart'
     as person;
+import 'package:telefilm/common/class/telegram/chat/chat_histories/video_messages.dart';
 import 'package:telefilm/common/class/telegram/chat/download_file_class.dart';
 import 'package:telefilm/common/class/telegram/chat/super_group_full_info_class.dart';
 import 'package:telefilm/common/class/telegram/chat/update_file.dart';
@@ -21,6 +22,7 @@ class TelegramDatas extends GetxController {
   Rx<SuperGroupFullInfo> superGroupFullInfo = SuperGroupFullInfo().obs;
   List<SuperGroupFullInfo> superGroupFullInfoList = <SuperGroupFullInfo>[].obs;
   RxList<Message> chatHistoryVideos = <Message>[].obs;
+  RxList<VideoMessages> videoMessages = <VideoMessages>[].obs;
   Rx<ThisCountry> thisCountry = ThisCountry(
       type: '',
       countryCode: '',

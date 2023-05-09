@@ -4,9 +4,9 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:telefilm/common/class/telegram/chat/chat_histories/chat_history_class.dart';
+import 'package:telefilm/common/class/telegram/chat/chat_histories/video_messages.dart';
 import 'package:telefilm/common/class/telegram/chat/download_file_class.dart';
 import 'package:telefilm/common/class/telegram/chat/super_group_full_info_class.dart';
 import 'package:telegram_client/tdlib/tdlib.dart';
@@ -18,6 +18,7 @@ import '../connect/tg_connect.dart';
 
 class TelegramGetters extends GetxController {
   final Tdlib tg = Get.put(GlobalConnectClass()).tg;
+
   Future<void> getCountries() async {
     await tg
         .request(
@@ -104,6 +105,7 @@ class TelegramGetters extends GetxController {
   }
 
   Future<void> loadChats() async {
+    telegramProgress.loadChatsStatus.value = true;
     await tg
         .request(
       "getChats",
@@ -115,20 +117,23 @@ class TelegramGetters extends GetxController {
       isVoid: true,
       extra: 'getChats',
     )
-        .then((value) async {
+        .catchError((onError) {
+      print("Error $onError");
+    }).then((value) {
       if (value.isNotEmpty) {
         final json = jsonEncode(value);
-        // log(json);
         try {
           Chats chats = chatsFromJson(json);
           telegramDatas.chats.value = chats;
         } catch (e) {
           print("Error Load Chats $e");
         }
+      } else {
+        print("Chats result json is Empty");
       }
     }).catchError((onError) {
-      print("Error $onError");
-    });
+      log("Error when load chats $onError");
+    }).whenComplete(() => telegramProgress.loadChatsStatus.value = false);
   }
 
   Future<void> getUser(int userId) async {
@@ -213,7 +218,7 @@ class TelegramGetters extends GetxController {
   }
 
   Future<void> getSupergroupFullInfo(int supergroupId) async {
-    await tg
+    Map<dynamic, dynamic> result = await tg
         .request(
       "getSupergroupFullInfo",
       parameters: {
@@ -223,21 +228,21 @@ class TelegramGetters extends GetxController {
       isVoid: true,
       extra: 'getSupergroupFullInfo',
     )
-        .then((value) async {
-      if (value.isNotEmpty) {
-        final json = jsonEncode(value);
-        log(json);
-        try {
-          SuperGroupFullInfo superGroupFullInfo =
-              superGroupFullInfoFromJson(json);
-          telegramDatas.superGroupFullInfo.value = superGroupFullInfo;
-        } catch (e) {
-          print("Error ${e.reactive}");
-        }
-      }
-    }).catchError((onError) {
+        .catchError((onError) {
       print("Error $onError");
     });
+
+    if (result.isNotEmpty) {
+      final json = jsonEncode(result);
+      try {
+        SuperGroupFullInfo superGroupFullInfo =
+            superGroupFullInfoFromJson(json);
+
+        telegramDatas.superGroupFullInfo.value = superGroupFullInfo;
+      } catch (e) {
+        print("Error ${e.reactive}");
+      }
+    } else {}
   }
 
   Future<void> getChat(int chatId) async {
@@ -375,9 +380,31 @@ class TelegramGetters extends GetxController {
                   ?.where((element) => element.content?.type == "messageVideo")
                   .toList() ??
               [];
+          // groupInfo = telegramDatas.superGroupFullInfoList.where((element) => element.reactive.)
+
           for (var i = 0; i < list.length; i++) {
             print('History list count $i');
-            telegramDatas.chatHistoryVideos.add(list[i]);
+            final groupId = list[i].chatId;
+            await telegramGetters.getSupergroupFullInfo(int.parse(
+              groupId.toString().substring(4),
+            ));
+            telegramDatas.superGroupFullInfo.listen((callback) {
+              List<VideoMessages> isEqual = telegramDatas.videoMessages
+                  .where((element) => element.message.id = list[i].id)
+                  .toList();
+              print("VideoMessages List ${isEqual.isEmpty} ");
+              isEqual.isEmpty
+                  ? telegramDatas.videoMessages
+                      .add(VideoMessages(i, callback, list[i]))
+                  : null;
+            });
+            List<Message> isEqual = telegramDatas.chatHistoryVideos
+                .where((element) => identical(element, list[i]))
+                .toList();
+            print("Message List $isEqual ");
+            isEqual.isEmpty
+                ? telegramDatas.chatHistoryVideos.add(list[i])
+                : null;
           }
         } catch (e) {
           print("Error Chat History $e");
@@ -407,15 +434,6 @@ class TelegramGetters extends GetxController {
         .then((value) async {
       if (value.isNotEmpty) {
         final json = jsonEncode(value);
-        // print(json);
-        debugPrint(json);
-        // try {
-        //   Chats chats = chatsFromJson(json);
-        //   telegramDatas.chats.value = chats;
-        //   print('Resultss ${chats.result}');
-        // } catch (e) {
-        //   print("EEEEEEEEEEEEEEEE $e");
-        // }
       }
     }).catchError((onError) {
       print("Error $onError");

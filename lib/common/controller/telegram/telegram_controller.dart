@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, constant_identifier_names
 
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -114,7 +115,7 @@ class TelegramController extends GetxController {
   dynamic callback(UpdateTd updateTd) async {
     Future(() async {
       if (kDebugMode) {
-        print(jsonEncode(updateTd.raw));
+        log(jsonEncode(updateTd.raw));
       }
       final type = updateTd.raw["@type"];
       switch (type) {

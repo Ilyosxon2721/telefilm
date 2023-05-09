@@ -35,8 +35,6 @@ class Chats {
 class Result {
   int? id;
   String? title;
-  Usernames? usernames;
-  String? username;
   String? status;
   Type? type;
   ResultDetail? detail;
@@ -44,13 +42,13 @@ class Result {
   bool? isBot;
   String? firstName;
   String? lastName;
+  Usernames? usernames;
+  String? username;
   String? phoneNumber;
 
   Result({
     this.id,
     this.title,
-    this.usernames,
-    this.username,
     this.status,
     this.type,
     this.detail,
@@ -58,16 +56,14 @@ class Result {
     this.isBot,
     this.firstName,
     this.lastName,
+    this.usernames,
+    this.username,
     this.phoneNumber,
   });
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
         id: json["id"],
         title: json["title"],
-        usernames: json["usernames"] == null
-            ? null
-            : Usernames.fromJson(json["usernames"]),
-        username: json["username"],
         status: json["status"],
         type: typeValues.map[json["type"]]!,
         detail: json["detail"] == null
@@ -79,14 +75,16 @@ class Result {
         isBot: json["is_bot"],
         firstName: json["first_name"],
         lastName: json["last_name"],
+        usernames: json["usernames"] == null
+            ? null
+            : Usernames.fromJson(json["usernames"]),
+        username: json["username"],
         phoneNumber: json["phone_number"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "title": title,
-        "usernames": usernames?.toJson(),
-        "username": username,
         "status": status,
         "type": typeValues.reverse[type],
         "detail": detail?.toJson(),
@@ -94,6 +92,8 @@ class Result {
         "is_bot": isBot,
         "first_name": firstName,
         "last_name": lastName,
+        "usernames": usernames?.toJson(),
+        "username": username,
         "phone_number": phoneNumber,
       };
 }
@@ -245,11 +245,12 @@ class LastMessage {
   bool? isChannelPost;
   bool? isTopicMessage;
   bool? containsUnreadMention;
-  List<Entity>? entities;
   String? typeContent;
+  List<NewMember>? newMembers;
+  List<Entity>? entities;
+  String? text;
   Video? video;
   String? caption;
-  String? text;
   List<Photo>? photo;
 
   LastMessage({
@@ -275,11 +276,12 @@ class LastMessage {
     this.isChannelPost,
     this.isTopicMessage,
     this.containsUnreadMention,
-    this.entities,
     this.typeContent,
+    this.newMembers,
+    this.entities,
+    this.text,
     this.video,
     this.caption,
-    this.text,
     this.photo,
   });
 
@@ -306,14 +308,18 @@ class LastMessage {
         isChannelPost: json["is_channel_post"],
         isTopicMessage: json["is_topic_message"],
         containsUnreadMention: json["contains_unread_mention"],
+        typeContent: json["type_content"],
+        newMembers: json["new_members"] == null
+            ? []
+            : List<NewMember>.from(
+                json["new_members"]!.map((x) => NewMember.fromJson(x))),
         entities: json["entities"] == null
             ? []
             : List<Entity>.from(
                 json["entities"]!.map((x) => Entity.fromJson(x))),
-        typeContent: json["type_content"],
+        text: json["text"],
         video: json["video"] == null ? null : Video.fromJson(json["video"]),
         caption: json["caption"],
-        text: json["text"],
         photo: json["photo"] == null
             ? []
             : List<Photo>.from(json["photo"]!.map((x) => Photo.fromJson(x))),
@@ -342,13 +348,16 @@ class LastMessage {
         "is_channel_post": isChannelPost,
         "is_topic_message": isTopicMessage,
         "contains_unread_mention": containsUnreadMention,
+        "type_content": typeContent,
+        "new_members": newMembers == null
+            ? []
+            : List<dynamic>.from(newMembers!.map((x) => x.toJson())),
         "entities": entities == null
             ? []
             : List<dynamic>.from(entities!.map((x) => x.toJson())),
-        "type_content": typeContent,
+        "text": text,
         "video": video?.toJson(),
         "caption": caption,
-        "text": text,
         "photo": photo == null
             ? []
             : List<dynamic>.from(photo!.map((x) => x.toJson())),
@@ -404,10 +413,13 @@ class LastMessageClass {
   Map<String, dynamic> toJson() => {};
 }
 
-enum Type { CHANNEL, PRIVATE }
+enum Type { SUPERGROUP, PRIVATE, CHANNEL }
 
-final typeValues =
-    EnumValues({"channel": Type.CHANNEL, "private": Type.PRIVATE});
+final typeValues = EnumValues({
+  "channel": Type.CHANNEL,
+  "private": Type.PRIVATE,
+  "supergroup": Type.SUPERGROUP
+});
 
 class Entity {
   int? offset;
@@ -430,6 +442,36 @@ class Entity {
         "offset": offset,
         "length": length,
         "type": type,
+      };
+}
+
+class NewMember {
+  int? id;
+  String? firstName;
+  Type? type;
+  LastMessageClass? lastMessage;
+
+  NewMember({
+    this.id,
+    this.firstName,
+    this.type,
+    this.lastMessage,
+  });
+
+  factory NewMember.fromJson(Map<String, dynamic> json) => NewMember(
+        id: json["id"],
+        firstName: json["first_name"],
+        type: typeValues.map[json["type"]]!,
+        lastMessage: json["last_message"] == null
+            ? null
+            : LastMessageClass.fromJson(json["last_message"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "first_name": firstName,
+        "type": typeValues.reverse[type],
+        "last_message": lastMessage?.toJson(),
       };
 }
 

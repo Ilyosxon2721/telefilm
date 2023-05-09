@@ -14,6 +14,7 @@ import '../connect/tg_connect.dart';
 
 class TelegramSend extends GetxController {
   final Tdlib tg = Get.put(GlobalConnectClass()).tg;
+
   Future<void> setAuthenticationPhoneNumber(phoneNumber) async {
     await tg
         .request(

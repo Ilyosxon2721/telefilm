@@ -10,27 +10,23 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:sliver_tools/sliver_tools.dart';
-import 'package:telefilm/common/getter/getter.dart';
+import 'package:telefilm/common/class/telegram/chat/super_group_full_info_class.dart';
 
 import '../../common/class/telegram/chat/chat_histories/chat_history_class.dart'
     as history;
 import '../../common/class/telegram/chats.dart';
+import '../../common/getter/getter.dart';
 import '../content_info/view.dart';
 import 'index.dart';
 
 class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
   const AndroidGeneralPage({Key? key}) : super(key: key);
-  Future<File> channelPhoto(history.Message message) async {
-    await telegramGetters.getSupergroupFullInfo(
-      int.parse(
-        message.chatId.toString().substring(4),
-      ),
-    );
-    String path = telegramDatas
-            .superGroupFullInfo.value.photo?.sizes?.first.photo?.local?.path ??
-        '';
-    int photoId =
-        telegramDatas.superGroupFullInfo.value.photo?.sizes?.first.photo?.id;
+
+  Future<File> channelPhoto(
+      history.Message message, SuperGroupFullInfo superGroupFullInfo) async {
+    String path =
+        superGroupFullInfo.photo?.sizes?.first.photo?.local?.path ?? '';
+    int photoId = superGroupFullInfo.photo?.sizes?.first.photo?.id;
     File file = path != ''
         ? File(path)
         : await telegramGetters.getFile(photoId, 1, 1, 0, true);
@@ -141,8 +137,8 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
     return Chewie(controller: controller.chewieController.value);
   }
 
-  Widget _buildHeaderForPost(
-      int index, history.Message message, channel, String date) {
+  Widget _buildHeaderForPost(int index, history.Message message, channel,
+      SuperGroupFullInfo superGroupFullInfo, String date) {
     return ListTile(
       leading: Container(
         width: 40.w,
@@ -154,7 +150,7 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: FutureBuilder(
-                future: channelPhoto(message),
+                future: channelPhoto(message, superGroupFullInfo),
                 builder: (BuildContext context, AsyncSnapshot file) {
                   final photo = file.data;
                   return photo != null
@@ -385,10 +381,12 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
   }
 
   PageStorage _buildContent(context, int contentIndex) {
-    Iterable<Result>? channel = telegramDatas.chats.value.result?.where(
-        (element) =>
-            element.id == telegramDatas.chatHistoryVideos[contentIndex].chatId);
-    history.Message message = telegramDatas.chatHistoryVideos[contentIndex];
+    SuperGroupFullInfo superGroupFullInfo =
+        telegramDatas.videoMessages[contentIndex].superGroupFullInfo;
+    history.Message message = telegramDatas.videoMessages[contentIndex].message;
+    Iterable<Result>? channel = telegramDatas.chats.value.result
+        ?.where((element) => element.id == message.chatId);
+    // history.Message message = telegramDatas.chatHistoryVideos[contentIndex];
 
     final date = DateFormat('dd/MM/yyyy - hh:mm')
         .format(DateTime.fromMillisecondsSinceEpoch(
@@ -403,7 +401,8 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
         child: Column(
           children: [
             _buildPost(context, contentIndex, message),
-            _buildHeaderForPost(contentIndex, message, channel, date),
+            _buildHeaderForPost(
+                contentIndex, message, channel, superGroupFullInfo, date),
           ],
         ),
       ),
@@ -414,15 +413,17 @@ class AndroidGeneralPage extends GetView<AndroidGeneralPageController> {
     return MultiSliver(
       children: [
         // _buildHistoryPanel(),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            childCount: telegramDatas.chatHistoryVideos.length,
-            (context, index) {
-              print("Index $index");
-              return _buildContent(context, index);
-            },
-          ),
-        ),
+        Obx(() {
+          return SliverList(
+            delegate: SliverChildBuilderDelegate(
+              childCount: telegramDatas.videoMessages.length,
+              (context, index) {
+                print("Content length ${telegramDatas.videoMessages.length}");
+                return _buildContent(context, index);
+              },
+            ),
+          );
+        }),
       ],
     );
   }

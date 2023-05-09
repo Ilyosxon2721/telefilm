@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, avoid_print
 
 import 'dart:async';
 
@@ -25,44 +25,6 @@ class AndroidMainPage extends GetView<AndroidMainPageController> {
 
       controller.isProcessing.value = false;
     });
-  }
-
-  Future<void> showLoading() {
-    final light = EasyLoading.instance
-      ..displayDuration = const Duration(milliseconds: 2000)
-      ..indicatorType = EasyLoadingIndicatorType.spinningCircle
-      ..loadingStyle = EasyLoadingStyle.light
-      ..indicatorSize = 45.0
-      ..radius = 10.0
-      ..progressColor = Colors.grey
-      ..backgroundColor = Colors.white
-      ..indicatorColor = Colors.grey
-      ..textColor = Colors.black
-      ..maskColor = Colors.transparent.withOpacity(0.2)
-      ..userInteractions = true
-      ..dismissOnTap = false;
-    final dark = EasyLoading.instance
-      ..displayDuration = const Duration(milliseconds: 2000)
-      ..indicatorType = EasyLoadingIndicatorType.spinningCircle
-      ..loadingStyle = EasyLoadingStyle.dark
-      ..indicatorSize = 45.0
-      ..radius = 10.0
-      ..progressColor = Colors.white60
-      ..backgroundColor = Colors.black
-      ..indicatorColor = Colors.white60
-      ..textColor = Colors.white60
-      ..maskColor = Colors.transparent.withOpacity(0.2)
-      ..userInteractions = true
-      ..dismissOnTap = false;
-    Get.theme.brightness == Brightness.light ? light : dark;
-    // ..customAnimation = CustomAnimation();
-    return EasyLoading.show(
-      maskType: EasyLoadingMaskType.custom,
-      dismissOnTap: false,
-      indicator: CupertinoActivityIndicator(
-        radius: 25.0,
-      ),
-    );
   }
 
   SliverAppBar _buildAppBar() {
@@ -130,9 +92,6 @@ class AndroidMainPage extends GetView<AndroidMainPageController> {
                   CupertinoIcons.search,
                   size: 22.sp,
                 ),
-
-                // isDense: true,
-                // contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
               ),
             ),
           ),
@@ -146,10 +105,8 @@ class AndroidMainPage extends GetView<AndroidMainPageController> {
     final controller = Get.put(AndroidMainPageController());
     return Obx(
       () {
-        print(
-            "Chat History Total Count ${telegramDatas.chatHistory.value.totalCount}");
         controller.isProcessing.value
-            ? showLoading()
+            ? functions.showLoading()
             : EasyLoading.dismiss(animation: true);
         return RefreshIndicator(
           strokeWidth: 4,

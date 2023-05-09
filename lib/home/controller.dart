@@ -5,7 +5,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
+import '../chats/view.dart';
 import '../main/view.dart';
+import '../profile/view.dart';
 import 'index.dart';
 
 class AndroidHomePageController extends GetxController
@@ -20,10 +22,10 @@ class AndroidHomePageController extends GetxController
   List<Widget> buildScreens() {
     return [
       const AndroidMainPage(),
-      const Center(child: Text('Second')),
+      const AndroidChatsPage(),
       const Center(child: Text('Three')),
       const Center(child: Text('Four')),
-      const Center(child: Text('Five')),
+      const AndroidProfilePage(),
     ];
   }
 
